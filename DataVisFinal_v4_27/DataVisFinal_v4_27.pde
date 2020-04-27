@@ -199,11 +199,23 @@ void artistList() {
  
 public PImage getArtistPopWork(int artistIndex){
   String artistName = name[artistIndex];
+  String[] names = artistName.split(" ");
   int mostPopWork = popWork[artistIndex];
   
-  String[] firstLastName = artistName.split(" ");
-  String imgPath = "images/" + firstLastName[0] + "_" + firstLastName[1] + "/";
-  imgPath += firstLastName[0] + "_" + firstLastName[1] + "_" + mostPopWork + "_popular";
+  String tempArtistName = "";
+  for(int i = 0; i < names.length; i++){
+    if(i != names.length - 1){
+      tempArtistName += names[i] + "_";
+    }
+    else{
+      tempArtistName += names[i];
+    }
+  }
+  
+  println(tempArtistName);
+  
+  String imgPath = "images/" + tempArtistName + "/";
+  imgPath += tempArtistName + "_" + mostPopWork + "_popular.jpg";
   println(imgPath);
   
   return loadImage(imgPath);
