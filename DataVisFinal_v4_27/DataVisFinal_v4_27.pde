@@ -23,6 +23,8 @@ float[] lat;
 float[] lon;
 int[] popWork;
 
+int maxPaintings;
+
 
 boolean cityList = false;
 boolean artTab = false;
@@ -31,12 +33,11 @@ int artTabIndex = -1;
 
 
 void setup(){
-  size(1080, 720);
+  size(1800, 900);
   //size(3000, 2000);
   map = loadImage("EquiProjMap.png");
   map.resize(width, int(0.853333333*height));
   image(map, 0, 0);
-  
   
   artistInfo = loadTable("artists_with_birthplace.csv", "header");
   
@@ -71,8 +72,9 @@ void setup(){
      popWork[i] = artistInfo.getInt(i,11);
      
      buttonsCreate(lat, lon);
-
   }
+  maxPaintings = getMaxImages();
+  
   drawCities(lat, lon);
 }
 
@@ -150,6 +152,17 @@ void keyPressed() {
 }
 
 
+int getMaxImages(){
+  int max = 0;
+  for(int i = 0; i < paintings.length; i++){
+    if(max < paintings[i]){
+      max = paintings[i];
+    }
+  }
+ 
+    return max;
+}
+
 
 void drawCities(float[] lat, float[] lon){
    fill(255);
@@ -182,10 +195,21 @@ void artistList() {
     fill(50,50,255);
     text(birthplace[orderedList.get(i)], i*(0.15*width), (0.15*height));
     
-    float paint = paintings[orderedList.get(i)]*1.5;
+    float paint = paintings[orderedList.get(i)];
+    println(name[orderedList.get(i)] + ": " + paintings[orderedList.get(i)]);
     PImage artistImage = getArtistPopWork(orderedList.get(i));
-    artistImage.resize(int (0.025*width), height);
-    image(artistImage, (i*(0.15*width)+0.025), height-paint);
+    float ypct = paint / maxPaintings;
+    
+    if(artistImage.width > artistImage.height){
+      println("photo is landscape");
+      artistImage.resize(int (0.1*width), int(ypct * 10));
+      image(artistImage, (i*(0.15*width)+1), height - artistImage.height);
+    }
+    else{
+      println("photo is portrait");
+      artistImage.resize(int (0.1*width), int(ypct * 10));
+      image(artistImage, (i*(0.15*width)+1), height - artistImage.height);
+    }
     
     // rect((i*(0.15*width)+0.025), height-paint, (0.025*width), height);
     
