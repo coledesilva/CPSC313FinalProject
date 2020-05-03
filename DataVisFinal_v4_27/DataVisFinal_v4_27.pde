@@ -73,7 +73,6 @@ void setup(){
      
      buttonsCreate(lat, lon);
   }
-  maxPaintings = getMaxImages();
   
   drawCities(lat, lon);
 }
@@ -109,16 +108,16 @@ void mousePressed(){
   
   for (int x = 0; x < buttons.length; x++){
     if(cityList == false &&
-    (mouseY > (buttons[x][1]) &&  mouseY < (buttons[x][1]+20.0))
-    && (mouseX < (buttons[x][0]) &&  mouseX > (buttons[x][0]-20.0))){
+    (mouseY > (buttons[x][1]) &&  mouseY < (buttons[x][1]+(0.0111*width)))
+    && (mouseX < (buttons[x][0]) &&  mouseX > (buttons[x][0]-(0.0111*width)))){
       idIndex = new IntList();
     }
   }
   
   for (int id = 0; id < buttons.length; id++){
     if(cityList == false &&
-    (mouseY > (buttons[id][1]) &&  mouseY < (buttons[id][1]+20.0))
-    && (mouseX < (buttons[id][0]) &&  mouseX > (buttons[id][0]-20.0))){
+    (mouseY > (buttons[id][1]) &&  mouseY < (buttons[id][1]+(0.0111*width)))
+    && (mouseX < (buttons[id][0]) &&  mouseX > (buttons[id][0]-(0.0111*width)))){
        //println("hazah!");
        cityListFlag = true;
        idIndex.append(id);
@@ -129,8 +128,8 @@ void mousePressed(){
   if (cityList) { 
     for (int y = 0; y < picButton.length; y++) {
       //println(picButton.length);
-      if ((mouseX > picButton[y][0] && mouseX < (picButton[y][0]+40)) && (mouseY > picButton[y][1] && mouseY < height)){
-        println("woop");
+      if ((mouseX > picButton[y][0] && mouseX < (picButton[y][0 ]+ (.1* width))) && (mouseY > picButton[y][1] && mouseY < height)){
+        //println("woop");
         artTab = true;
         artTabIndex = int(picButton[y][2]);
         
@@ -138,25 +137,39 @@ void mousePressed(){
     }
   }
   
+  if ((cityList) &&
+  (mouseX < (0.1*width)) &&
+  (mouseY < (0.05*height))) {
+    cityList = false;
+    idIndex.clear();
+  }
+  
+  if (artTab &&
+  ((mouseX > 0.88 * width) && (mouseX < 0.92 * width)) &&
+  ((mouseY > 0.08 * height) && (mouseY < 0.12 * height))) {
+    artTab = false;
+  }
+  
+  
   if (cityListFlag) {
     cityList = true;
   }
   
 }
 
-void keyPressed() {
+/*void keyPressed() {
   if (keyCode == DOWN && cityList == true) {
     cityList = false; 
     idIndex.clear();
   }
-}
+}*/
 
 
-int getMaxImages(){
+int getMaxPaintings(IntList orderedList){
   int max = 0;
-  for(int i = 0; i < paintings.length; i++){
-    if(max < paintings[i]){
-      max = paintings[i];
+  for(int i = 0; i < orderedList.size(); i++){
+    if(max < paintings[orderedList.get(i)]){
+      max = paintings[orderedList.get(i)];
     }
   }
  
@@ -181,44 +194,47 @@ void artistList() {
   textSize(35);
   fill(0);
   
+  int maxPaintings = getMaxPaintings(orderedList);
+  //println(maxPaintings);
+  
   picButton = new float[idIndex.size()][3];
   for (int i = 0; i < orderedList.size(); i++) {
     //println(orderedList.get(i));
-    textSize(35);
+    textSize(int(0.01367*width));
     fill(0);
-    text(name[orderedList.get(i)], i*(0.15*width), (0.05*height));
+    text(name[orderedList.get(i)], i*(0.15*width), (0.08*height));
     
-    textSize(25);
+    /*textSize(int(0.00967*width));
     fill(100,100,255);
     
-    text("Birthplace:", i*(0.15*width), (0.12*height));
+    text("Birthplace:", i*(0.15*width), (0.15*height));
     fill(50,50,255);
-    text(birthplace[orderedList.get(i)], i*(0.15*width), (0.15*height));
+    text(birthplace[orderedList.get(i)], i*(0.15*width), (0.18*height));*/
     
     float paint = paintings[orderedList.get(i)];
-    println(name[orderedList.get(i)] + ": " + paintings[orderedList.get(i)]);
+    //println(name[orderedList.get(i)] + ": " + paintings[orderedList.get(i)]);
     PImage artistImage = getArtistPopWork(orderedList.get(i));
     float ypct = paint / maxPaintings;
+    //println(ypct + " " + name[orderedList.get(i)]);
     
-    if(artistImage.width > artistImage.height){
-      println("photo is landscape");
-      artistImage.resize(int (0.1*width), int(ypct * 10));
-      image(artistImage, (i*(0.15*width)+1), height - artistImage.height);
-    }
-    else{
-      println("photo is portrait");
-      artistImage.resize(int (0.1*width), int(ypct * 10));
-      image(artistImage, (i*(0.15*width)+1), height - artistImage.height);
-    }
+    artistImage.resize(int (0.1*width), int(ypct * (height - (0.2*height))));
+    image(artistImage, (i*(0.15*width)), height - artistImage.height);
+
     
     // rect((i*(0.15*width)+0.025), height-paint, (0.025*width), height);
     
     
-    picButton[i][0] = (i*(0.15*width)+0.025);
-    picButton[i][1] = height-paint;
+    picButton[i][0] = (i*(0.15*width));
+    picButton[i][1] = height - artistImage.height;
     picButton[i][2] = orderedList.get(i);
     //makePicClickable(20+(300*i), height-paint, 40, orderedList.get(i));
   }
+  fill(255);
+  stroke(0);
+  rect(0,0,(0.1*width), (0.05*height));
+  fill(0);
+  textSize(int(0.01367*width));
+  text("Back to Map", (0.007813*width),(0.033*height));
 }
  
 public PImage getArtistPopWork(int artistIndex){
@@ -236,11 +252,11 @@ public PImage getArtistPopWork(int artistIndex){
     }
   }
   
-  println(tempArtistName);
+  //println(tempArtistName);
   
   String imgPath = "images/" + tempArtistName + "/";
   imgPath += tempArtistName + "_" + mostPopWork + "_popular.jpg";
-  println(imgPath);
+  //println(imgPath);
   
   return loadImage(imgPath);
 }
@@ -272,16 +288,25 @@ IntList orderArtistByCount() {
 }
 
 void artistTable(int artistIndex) {
+  float boxWidth;
+  float boxHeight;
   
   fill(100);
   rect((0.1*width),(0.1*height),(0.8*width),(0.8*height));
+  fill(0);
+  rect((0.88*width),(0.08*height),(0.04*width),(0.04*height));
   
   fill(255);
-  text(name[artistIndex],(0.15*width),(0.15*height));
-  text("Birthplace: " + birthplace[artistIndex], (0.15*width), (0.18*height)); 
-  text("Years: " + years[artistIndex], (0.15*width), (0.21*height));
-  text("Genre: " + genre[artistIndex], (0.15*width), (0.24*height)); 
-  text("Nationality: " + nationality[artistIndex], (0.15*width), (0.27*height)); 
+  textSize(int(0.00767*width));
+  text(name[artistIndex],(0.12*width),(0.15*height));
+  text("Birthplace: " + birthplace[artistIndex], (0.12*width), (0.18*height)); 
+  text("Nationality: " + nationality[artistIndex], (0.12*width), (0.21*height));
+  text("Years: " + years[artistIndex], (0.12*width), (0.24*height));
+  text("Genre: " + genre[artistIndex], (0.12*width), (0.27*height));
+  text("Number of paitnings: " + paintings[artistIndex], (0.12*width), (0.3*height));
+  text("Wikipedia Link: " + wikipedia[artistIndex], (0.12*width), (0.33*height));
+  text("Biogrphy: " + bio[artistIndex], (0.12*width), (0.36*height),(0.3*width), (0.6*height));
+  
 
   
 }
